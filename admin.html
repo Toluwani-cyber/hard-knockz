@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSOHK — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0b0b0b;--bg2:#111;--bg3:#181818;--bg4:#1f1f1f;
+  --ink:#ede8df;--muted:#666;--dim:#272727;--border:#222;
+  --red:#bf2b1e;--red2:#d63a2c;--gold:#c9a84c;
+  --green:#2e7d4f;--green2:#3aaf6a;
+  --serif:'Crimson Pro',Georgia,serif;
+  --mono:'DM Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+}
+html,body{min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--mono);overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7;}
+
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+.login-wrap{width:100%;max-width:400px;animation:riseIn 0.5s ease both;}
+.login-logo{font-family:var(--display);font-size:36px;letter-spacing:0.06em;margin-bottom:4px;}
+.login-logo span{color:var(--red);}
+.login-caption{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:2.5rem;}
+.login-card{background:var(--bg2);border:1px solid var(--border);padding:2.5rem;}
+.login-title{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;}
+.login-title::after{content:'';flex:1;height:1px;background:var(--dim);}
+.field{margin-bottom:1.25rem;}
+.field-label{display:block;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.field-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--ink);font-family:var(--mono);font-size:14px;padding:11px 14px;outline:none;transition:border-color 0.2s;letter-spacing:0.05em;}
+.field-input:focus{border-color:var(--red);}
+.pw-wrap{position:relative;}
+.pw-wrap .field-input{padding-right:44px;}
+.pw-toggle{position:absolute;right:0;top:0;bottom:0;width:44px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:color 0.2s;}
+.pw-toggle:hover{color:var(--ink);}
+.login-btn{width:100%;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;padding:13px;background:var(--red);color:#fff;border:none;cursor:pointer;transition:background 0.2s,transform 0.1s;margin-top:0.5rem;}
+.login-btn:hover{background:var(--red2);}
+.login-btn:active{transform:scale(0.99);}
+.login-error{font-size:11px;color:var(--red2);margin-top:12px;min-height:18px;letter-spacing:0.06em;}
+.back-to-site{display:block;text-align:center;margin-top:1.5rem;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;cursor:pointer;background:none;border:none;font-family:var(--mono);width:100%;transition:color 0.2s;}
+.back-to-site:hover{color:var(--ink);}
+
+/* ADMIN */
+#adminScreen{display:none;min-height:100vh;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:50;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:56px;gap:1rem;}
+.topbar-logo{font-family:var(--display);font-size:20px;letter-spacing:0.08em;}
+.topbar-logo span{color:var(--red);}
+.topbar-badge{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--dim);color:var(--muted);}
+.topbar-spacer{flex:1;}
+.topbar-btn{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:7px 16px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all 0.15s;text-decoration:none;display:inline-block;}
+.topbar-btn:hover{border-color:var(--ink);color:var(--ink);}
+.topbar-btn.logout:hover{border-color:var(--red);color:var(--red);}
+
+/* Stats */
+.stat-strip{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);}
+.stat{flex:1;padding:1.25rem 2rem;border-right:1px solid var(--border);animation:riseIn 0.4s ease both;}
+.stat:last-child{border-right:none;}
+.stat-val{font-family:var(--display);font-size:36px;letter-spacing:0.04em;color:var(--ink);line-height:1;}
+.stat-val.red{color:var(--red);}
+.stat-val.gold{color:var(--gold);}
+.stat-lbl{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+
+/* Body */
+.admin-body{display:grid;grid-template-columns:380px 1fr;flex:1;min-height:calc(100vh - 56px - 68px);}
+.add-panel{border-right:1px solid var(--border);background:var(--bg2);padding:2rem;position:sticky;top:56px;max-height:calc(100vh - 56px);overflow-y:auto;}
+.panel-head{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--red);margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;}
+.panel-head::after{content:'';flex:1;height:1px;background:var(--dim);}
+.form-field{margin-bottom:1.25rem;}
+.form-label{display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.form-label .hint{font-size:9px;color:var(--dim);letter-spacing:0.05em;text-transform:none;}
+.form-ctrl{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--ink);font-family:var(--mono);font-size:13px;padding:10px 13px;outline:none;transition:border-color 0.2s;resize:none;line-height:1.5;}
+.form-ctrl:focus{border-color:var(--red);}
+.form-ctrl::placeholder{color:var(--muted);}
+.char-bar{height:2px;background:var(--dim);margin-top:4px;border-radius:1px;overflow:hidden;}
+.char-fill{height:100%;background:var(--red);transition:width 0.2s;border-radius:1px;width:0%;}
+.tag-suggestions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.tag-chip{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:3px 9px;border:1px solid var(--dim);color:var(--muted);cursor:pointer;background:transparent;font-family:var(--mono);transition:all 0.15s;}
+.tag-chip:hover{border-color:var(--red);color:var(--red);}
+.submit-btn{width:100%;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;padding:13px;background:var(--red);color:#fff;border:none;cursor:pointer;transition:background 0.2s,transform 0.1s;margin-top:0.5rem;position:relative;overflow:hidden;}
+.submit-btn:hover{background:var(--red2);}
+.submit-btn:active{transform:scale(0.99);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* Change password */
+.pw-panel{border-top:1px solid var(--border);margin:2rem -2rem -2rem;padding:1.5rem 2rem;background:var(--bg2);}
+.pw-panel-head{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem;display:flex;align-items:center;gap:10px;}
+.pw-panel-head::after{content:'';flex:1;height:1px;background:var(--dim);}
+.pw-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.pw-row .form-ctrl{flex:1;min-width:180px;}
+.pw-save-btn{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:11px 20px;background:var(--dim);color:var(--ink);border:1px solid var(--dim);cursor:pointer;white-space:nowrap;transition:all 0.15s;}
+.pw-save-btn:hover{background:var(--green);border-color:var(--green);}
+.pw-feedback{font-size:11px;color:var(--green2);margin-top:8px;min-height:18px;letter-spacing:0.06em;}
+
+/* List */
+.list-panel{padding:2rem;overflow-y:auto;}
+.list-head{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.list-title{font-family:var(--display);font-size:22px;letter-spacing:0.05em;}
+.list-spacer{flex:1;}
+.search-box{background:var(--bg2);border:1px solid var(--border);color:var(--ink);font-family:var(--mono);font-size:12px;padding:8px 13px;outline:none;width:220px;transition:border-color 0.2s;}
+.search-box:focus{border-color:var(--red);}
+.filter-sel{background:var(--bg2);border:1px solid var(--border);color:var(--ink);font-family:var(--mono);font-size:11px;padding:8px 13px;outline:none;cursor:pointer;}
+.q-table{display:flex;flex-direction:column;}
+.q-row{display:grid;grid-template-columns:36px 1fr 130px 110px 100px;gap:0;border-bottom:1px solid var(--border);transition:background 0.12s;}
+.q-row:hover{background:var(--bg2);}
+.q-row.header-row{border-bottom:1px solid var(--dim);background:var(--bg2);position:sticky;top:0;z-index:10;}
+.q-cell{padding:14px 16px;font-size:12px;display:flex;align-items:center;border-right:1px solid var(--border);}
+.q-cell:last-child{border-right:none;}
+.q-cell.header{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+.q-num{color:var(--muted);font-size:11px;justify-content:center;}
+.q-text-cell{flex-direction:column;align-items:flex-start;gap:5px;}
+.q-quote-text{font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.5;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.q-author-line{font-size:10px;color:var(--gold);letter-spacing:0.08em;text-transform:uppercase;}
+.q-tag-cell{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+.q-date-cell{font-size:11px;color:var(--muted);}
+.q-actions-cell{gap:6px;justify-content:center;}
+.act-btn{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;padding:5px 9px;font-size:11px;font-family:var(--mono);transition:all 0.15s;white-space:nowrap;letter-spacing:0.06em;text-transform:uppercase;}
+.act-btn.del:hover{border-color:var(--red);color:var(--red);}
+.act-btn.edit:hover{border-color:var(--gold);color:var(--gold);}
+.empty-row{padding:4rem 2rem;text-align:center;font-size:13px;color:var(--muted);letter-spacing:0.08em;}
+
+/* Edit modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:100;display:flex;align-items:center;justify-content:center;padding:2rem;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-bg.open{opacity:1;pointer-events:all;}
+.modal-card{background:var(--bg2);border:1px solid var(--dim);padding:2.5rem;max-width:580px;width:100%;transform:translateY(16px);transition:transform 0.22s;position:relative;}
+.modal-bg.open .modal-card{transform:translateY(0);}
+.modal-title{font-family:var(--display);font-size:22px;letter-spacing:0.05em;margin-bottom:1.75rem;}
+.modal-title span{color:var(--red);}
+.modal-close-btn{position:absolute;top:1.25rem;right:1.25rem;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;transition:color 0.15s;line-height:1;}
+.modal-close-btn:hover{color:var(--ink);}
+.modal-actions{display:flex;gap:10px;margin-top:1.5rem;}
+.modal-save{flex:1;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;padding:12px;background:var(--green);color:#fff;border:none;cursor:pointer;transition:background 0.2s;}
+.modal-save:hover{background:var(--green2);}
+.modal-cancel{font-family:var(--mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:12px 20px;background:transparent;color:var(--muted);border:1px solid var(--border);cursor:pointer;transition:all 0.15s;}
+.modal-cancel:hover{border-color:var(--ink);color:var(--ink);}
+
+/* Toast */
+.toast{position:fixed;bottom:2rem;right:2rem;font-size:12px;letter-spacing:0.08em;padding:10px 20px;opacity:0;transition:opacity 0.3s,transform 0.3s;transform:translateY(10px);pointer-events:none;z-index:300;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{background:var(--green2);color:#fff;}
+.toast.err{background:var(--red2);color:#fff;}
+.toast.info{background:var(--ink);color:var(--bg);}
+
+/* Loading bar */
+.loading-bar{position:fixed;top:0;left:0;height:2px;background:var(--red);width:0%;transition:width 0.3s;z-index:1000;}
+.loading-bar.active{width:70%;}
+.loading-bar.done{width:100%;opacity:0;transition:width 0.2s,opacity 0.4s 0.2s;}
+
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:rot 0.6s linear infinite;vertical-align:middle;margin-right:8px;}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+@media(max-width:900px){
+  .admin-body{grid-template-columns:1fr;}
+  .add-panel{position:static;max-height:none;border-right:none;border-bottom:1px solid var(--border);}
+  .q-row{grid-template-columns:28px 1fr 80px;}
+  .q-cell.hide-sm{display:none;}
+}
+@media(max-width:600px){
+  .stat-strip{flex-wrap:wrap;}
+  .stat{flex:1 1 45%;border-right:1px solid var(--border);}
+  .topbar{padding:0 1rem;}
+  .add-panel,.list-panel{padding:1.25rem;}
+  .search-box{width:100%;}
+}
+</style>
+</head>
+<body>
+<div class="loading-bar" id="loadingBar"></div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-logo">TSOHK <span>Admin</span></div>
+    <div class="login-caption">The School of Hard Knockz — Owner Access</div>
+    <div class="login-card">
+      <div class="login-title">Restricted Area</div>
+      <div class="field">
+        <label class="field-label" for="loginPw">Password</label>
+        <div class="pw-wrap">
+          <input class="field-input" type="password" id="loginPw"
+            placeholder="Enter your password"
+            onkeydown="if(event.key==='Enter') attemptLogin()"
+            autocomplete="current-password">
+          <button class="pw-toggle" onclick="toggleVis('loginPw',this)" type="button" tabindex="-1">&#128065;</button>
+        </div>
+      </div>
+      <button class="login-btn" onclick="attemptLogin()">Enter Dashboard</button>
+      <div class="login-error" id="loginErr"></div>
+    </div>
+    <a class="back-to-site" href="index.html">← Back to public site</a>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="adminScreen">
+  <div class="topbar">
+    <div class="topbar-logo">TSOHK <span>Admin</span></div>
+    <div class="topbar-badge">Owner Dashboard</div>
+    <div class="topbar-spacer"></div>
+    <a class="topbar-btn" href="index.html" target="_blank">↗ View Public Site</a>
+    <button class="topbar-btn logout" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat" style="animation-delay:0s"><div class="stat-val red" id="statTotal">—</div><div class="stat-lbl">Total Quotes</div></div>
+    <div class="stat" style="animation-delay:0.06s"><div class="stat-val gold" id="statTags">—</div><div class="stat-lbl">Topics</div></div>
+    <div class="stat" style="animation-delay:0.12s"><div class="stat-val" id="statLatest">—</div><div class="stat-lbl">Last Added</div></div>
+    <div class="stat" style="animation-delay:0.18s"><div class="stat-val" id="statNewest">—</div><div class="stat-lbl">Newest Tag</div></div>
+  </div>
+
+  <div class="admin-body">
+    <!-- Add panel -->
+    <div class="add-panel">
+      <div class="panel-head">Add New Quote</div>
+
+      <div class="form-field">
+        <div class="form-label">Quote Text <span class="hint" id="charHint">0 / 500</span></div>
+        <textarea class="form-ctrl" id="fText" rows="6"
+          placeholder="Paste or type the quote exactly as it appeared on the channel..."
+          oninput="onTextInput()"></textarea>
+        <div class="char-bar"><div class="char-fill" id="charFill"></div></div>
+      </div>
+
+      <div class="form-field">
+        <div class="form-label">Source / Author <span class="hint">optional</span></div>
+        <input class="form-ctrl" type="text" id="fAuthor" placeholder="e.g. The School of Hard Knockz">
+      </div>
+
+      <div class="form-field">
+        <div class="form-label">Tag / Category <span class="hint">optional</span></div>
+        <input class="form-ctrl" type="text" id="fTag" placeholder="e.g. resilience">
+        <div class="tag-suggestions" id="tagSuggestions"></div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="addQuote()">+ Add to Archive</button>
+
+      <div class="pw-panel">
+        <div class="pw-panel-head">Change Password</div>
+        <div class="pw-row">
+          <div class="pw-wrap" style="flex:1;min-width:180px;">
+            <input class="form-ctrl" type="password" id="newPw" placeholder="New password">
+            <button class="pw-toggle" onclick="toggleVis('newPw',this)" type="button" tabindex="-1" style="top:0;bottom:0;">&#128065;</button>
+          </div>
+          <button class="pw-save-btn" onclick="changePassword()">Update</button>
+        </div>
+        <div class="pw-feedback" id="pwFeedback"></div>
+      </div>
+    </div>
+
+    <!-- List panel -->
+    <div class="list-panel">
+      <div class="list-head">
+        <div class="list-title">Archive</div>
+        <div class="list-spacer"></div>
+        <input class="search-box" type="text" id="searchBox" placeholder="Search quotes..." oninput="renderList()">
+        <select class="filter-sel" id="filterTag" onchange="renderList()">
+          <option value="">All tags</option>
+        </select>
+      </div>
+      <div class="q-table">
+        <div class="q-row header-row">
+          <div class="q-cell header q-num">#</div>
+          <div class="q-cell header">Quote</div>
+          <div class="q-cell header hide-sm">Tag</div>
+          <div class="q-cell header hide-sm">Date Added</div>
+          <div class="q-cell header">Actions</div>
+        </div>
+        <div id="qList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-bg" id="editModal" onclick="handleModalBg(event)">
+  <div class="modal-card">
+    <button class="modal-close-btn" onclick="closeEdit()">&#215;</button>
+    <div class="modal-title">Edit <span>Quote</span></div>
+    <input type="hidden" id="editId">
+    <div class="form-field">
+      <div class="form-label">Quote Text</div>
+      <textarea class="form-ctrl" id="editText" rows="5"></textarea>
+    </div>
+    <div class="form-field">
+      <div class="form-label">Author</div>
+      <input class="form-ctrl" type="text" id="editAuthor">
+    </div>
+    <div class="form-field">
+      <div class="form-label">Tag</div>
+      <input class="form-ctrl" type="text" id="editTag">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-save" onclick="saveEdit()">Save Changes</button>
+      <button class="modal-cancel" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── Supabase config ── */
+const SUPABASE_URL = 'https://wyfpfdqvpbwitnzttshw.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5ZnBmZHF2cGJ3aXRuenR0c2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTI5MzcsImV4cCI6MjA5NTUyODkzN30.fUoJ1U81O0UFvxkM5O61jvA2nxqwn1Z1c0piVqPIZgg';
+
+/* ── Password (stored in localStorage so it persists) ── */
+const PW_KEY = 'tsohk_admin_pw';
+const DEFAULT_PW = 'hardknocks2024';
+function getPassword() { return localStorage.getItem(PW_KEY) || DEFAULT_PW; }
+function setPassword(v) { localStorage.setItem(PW_KEY, v); }
+
+let quotes = [];
+let authed = false;
+
+/* ── Loading bar ── */
+function loader(on) {
+  const b = document.getElementById('loadingBar');
+  b.className = on ? 'loading-bar active' : 'loading-bar done';
+  if (!on) setTimeout(() => b.className = 'loading-bar', 600);
+}
+
+/* ── Supabase helper ── */
+async function db(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...opts.extraHeaders
+    },
+    ...opts
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+/* ── Auth ── */
+function attemptLogin() {
+  const val = document.getElementById('loginPw').value;
+  if (val === getPassword()) {
+    authed = true;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminScreen').style.display = 'flex';
+    document.getElementById('loginPw').value = '';
+    document.getElementById('loginErr').textContent = '';
+    loadQuotes();
+  } else {
+    document.getElementById('loginErr').textContent = 'Incorrect password — try again.';
+    document.getElementById('loginPw').value = '';
+    document.getElementById('loginPw').focus();
+  }
+}
+
+function logout() {
+  authed = false;
+  document.getElementById('adminScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginPw').focus();
+}
+
+function changePassword() {
+  const val = document.getElementById('newPw').value.trim();
+  const fb = document.getElementById('pwFeedback');
+  if (!val || val.length < 4) {
+    fb.style.color = 'var(--red2)';
+    fb.textContent = 'Password must be at least 4 characters.';
+    return;
+  }
+  setPassword(val);
+  document.getElementById('newPw').value = '';
+  fb.style.color = 'var(--green2)';
+  fb.textContent = '✓ Password updated.';
+  setTimeout(() => fb.textContent = '', 3000);
+}
+
+function toggleVis(id, btn) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+  btn.textContent = el.type === 'password' ? '👁' : '🙈';
+}
+
+/* ── Load quotes ── */
+async function loadQuotes() {
+  loader(true);
+  try {
+    quotes = await db('quotes?select=*&order=created_at.desc') || [];
+    renderAll();
+  } catch(e) {
+    showToast('Failed to load quotes from database.', 'err');
+    console.error(e);
+  }
+  loader(false);
+}
+
+/* ── Add quote ── */
+async function addQuote() {
+  const text   = document.getElementById('fText').value.trim();
+  const author = document.getElementById('fAuthor').value.trim() || 'The School of Hard Knockz';
+  const tag    = document.getElementById('fTag').value.trim().toLowerCase() || 'general';
+  if (!text) { showToast('Quote text is required.', 'err'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Saving...';
+
+  try {
+    const result = await db('quotes', {
+      method: 'POST',
+      body: JSON.stringify({ text, author, tag })
+    });
+    quotes.unshift(result[0]);
+    document.getElementById('fText').value   = '';
+    document.getElementById('fAuthor').value = '';
+    document.getElementById('fTag').value    = '';
+    document.getElementById('charHint').textContent = '0 / 500';
+    document.getElementById('charFill').style.width = '0%';
+    renderAll();
+    showToast('Quote added to archive.', 'ok');
+  } catch(e) {
+    showToast('Failed to save quote. Check console.', 'err');
+    console.error(e);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '+ Add to Archive';
+}
+
+/* ── Delete ── */
+async function deleteQuote(id) {
+  if (!confirm('Permanently delete this quote?')) return;
+  try {
+    await db(`quotes?id=eq.${id}`, { method: 'DELETE', prefer: 'return=minimal' });
+    quotes = quotes.filter(q => q.id !== id);
+    renderAll();
+    showToast('Quote deleted.', 'err');
+  } catch(e) {
+    showToast('Delete failed.', 'err');
+    console.error(e);
+  }
+}
+
+/* ── Edit ── */
+function openEdit(id) {
+  const q = quotes.find(x => x.id === id);
+  if (!q) return;
+  document.getElementById('editId').value     = q.id;
+  document.getElementById('editText').value   = q.text;
+  document.getElementById('editAuthor').value = q.author;
+  document.getElementById('editTag').value    = q.tag;
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeEdit() { document.getElementById('editModal').classList.remove('open'); }
+function handleModalBg(e) { if (e.target === document.getElementById('editModal')) closeEdit(); }
+
+async function saveEdit() {
+  const id     = document.getElementById('editId').value;
+  const text   = document.getElementById('editText').value.trim();
+  const author = document.getElementById('editAuthor').value.trim();
+  const tag    = document.getElementById('editTag').value.trim().toLowerCase();
+  if (!text) { showToast('Quote text cannot be empty.', 'err'); return; }
+  try {
+    const result = await db(`quotes?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ text, author, tag })
+    });
+    const idx = quotes.findIndex(q => q.id == id);
+    if (idx > -1) quotes[idx] = result[0];
+    closeEdit();
+    renderAll();
+    showToast('Quote updated.', 'ok');
+  } catch(e) {
+    showToast('Update failed.', 'err');
+    console.error(e);
+  }
+}
+
+/* ── Render ── */
+function renderAll() {
+  renderStats();
+  renderList();
+  renderTagSuggestions();
+}
+
+function renderStats() {
+  const tags   = new Set(quotes.map(q => q.tag));
+  const latest = quotes[0];
+  document.getElementById('statTotal').textContent  = quotes.length;
+  document.getElementById('statTags').textContent   = tags.size;
+  document.getElementById('statLatest').textContent = latest ? latest.created_at.slice(0,10) : '—';
+  document.getElementById('statNewest').textContent = latest ? latest.tag : '—';
+}
+
+function renderTagSuggestions() {
+  const tags = [...new Set(quotes.map(q => q.tag))].slice(0, 8);
+  document.getElementById('tagSuggestions').innerHTML = tags.map(t =>
+    `<button class="tag-chip" onclick="document.getElementById('fTag').value='${t}'">${t}</button>`
+  ).join('');
+}
+
+function renderList() {
+  const search = (document.getElementById('searchBox')?.value || '').toLowerCase();
+  const tag    = document.getElementById('filterTag')?.value || '';
+
+  const allTags = [...new Set(quotes.map(q => q.tag))].sort();
+  const sel = document.getElementById('filterTag');
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">All tags</option>` +
+    allTags.map(t => `<option value="${t}"${t===cur?' selected':''}>${t}</option>`).join('');
+
+  const filtered = quotes.filter(q => {
+    const mTag    = !tag    || q.tag === tag;
+    const mSearch = !search || q.text.toLowerCase().includes(search) ||
+                               q.author.toLowerCase().includes(search) ||
+                               q.tag.includes(search);
+    return mTag && mSearch;
+  });
+
+  const list = document.getElementById('qList');
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-row">No quotes match your filter.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map((q, i) => `
+    <div class="q-row">
+      <div class="q-cell q-num">${i+1}</div>
+      <div class="q-cell q-text-cell">
+        <div class="q-quote-text">"${q.text}"</div>
+        <div class="q-author-line">${q.author}</div>
+      </div>
+      <div class="q-cell q-tag-cell hide-sm">${q.tag}</div>
+      <div class="q-cell q-date-cell hide-sm">${q.created_at.slice(0,10)}</div>
+      <div class="q-cell q-actions-cell">
+        <button class="act-btn edit" onclick="openEdit(${q.id})">Edit</button>
+        <button class="act-btn del"  onclick="deleteQuote(${q.id})">Del</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function onTextInput() {
+  const n = document.getElementById('fText').value.length;
+  document.getElementById('charHint').textContent = `${n} / 500`;
+  document.getElementById('charFill').style.width = `${Math.min(100,(n/500)*100)}%`;
+}
+
+/* ── Toast ── */
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 2800);
+}
+</script>
+</body>
+</html>

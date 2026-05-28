@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The School of Hard Knockz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#0b0b0b; --bg2:#131313; --bg3:#1a1a1a;
+  --ink:#ede8df; --muted:#6b6b6b; --dim:#2e2e2e;
+  --red:#bf2b1e; --red2:#d63a2c; --gold:#c9a84c;
+  --serif:'Crimson Pro',Georgia,serif;
+  --mono:'DM Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+}
+html,body { min-height:100vh; background:var(--bg); color:var(--ink); font-family:var(--mono); overflow-x:hidden; }
+body::after { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"); pointer-events:none; z-index:9999; opacity:0.7; }
+.site { display:flex; flex-direction:column; min-height:100vh; }
+
+/* Header */
+header { padding:3rem 2.5rem 2rem; border-bottom:1px solid var(--dim); display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; }
+.logo-eyebrow { font-size:10px; letter-spacing:0.3em; text-transform:uppercase; color:var(--red); margin-bottom:4px; }
+.logo-main { font-family:var(--display); font-size:clamp(44px,8vw,80px); line-height:0.92; letter-spacing:0.04em; color:var(--ink); }
+.logo-main em { color:var(--red); font-style:normal; }
+.logo-sub { font-family:var(--serif); font-style:italic; font-size:15px; color:var(--muted); margin-top:10px; }
+.issue-badge { text-align:right; flex-shrink:0; }
+.issue-num { font-family:var(--display); font-size:48px; letter-spacing:0.05em; color:var(--dim); line-height:1; }
+.issue-label { font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+
+/* Main */
+main { flex:1; padding:3rem 2.5rem; max-width:900px; margin:0 auto; width:100%; }
+.section-tag { font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:var(--muted); margin-bottom:1.5rem; display:flex; align-items:center; gap:12px; }
+.section-tag::after { content:''; flex:1; height:1px; background:var(--dim); }
+
+/* QOTD */
+.qotd-section { margin-bottom:4rem; animation:riseIn 0.7s ease both; }
+.qotd-frame { border:1px solid var(--dim); background:var(--bg2); padding:3rem 3rem 2.5rem; position:relative; overflow:hidden; min-height:200px; display:flex; flex-direction:column; justify-content:space-between; }
+.qotd-frame::before { content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:linear-gradient(to bottom,var(--red),transparent); }
+.qotd-frame::after { content:'\201C'; position:absolute; top:-20px; right:24px; font-family:var(--serif); font-size:180px; line-height:1; color:var(--red); opacity:0.06; pointer-events:none; }
+.qotd-placeholder { font-family:var(--serif); font-style:italic; font-size:22px; color:var(--muted); line-height:1.6; text-align:center; padding:2rem 0; }
+.qotd-text { font-family:var(--serif); font-style:italic; font-size:clamp(22px,3.5vw,32px); line-height:1.6; color:var(--ink); margin-bottom:2rem; opacity:0; transition:opacity 0.5s; }
+.qotd-text.visible { opacity:1; }
+.qotd-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; opacity:0; transition:opacity 0.4s 0.3s; }
+.qotd-footer.visible { opacity:1; }
+.qotd-byline { display:flex; align-items:center; gap:12px; }
+.qotd-dash { width:28px; height:1px; background:var(--red); }
+.qotd-author { font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); }
+.qotd-tag { font-size:10px; letter-spacing:0.12em; text-transform:uppercase; padding:3px 10px; border:1px solid var(--dim); color:var(--muted); }
+
+/* Buttons */
+.btn-row { display:flex; gap:12px; margin-top:1.5rem; flex-wrap:wrap; }
+.btn-primary { font-family:var(--mono); font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; padding:14px 32px; background:var(--red); color:#fff; border:none; cursor:pointer; transition:background 0.2s,transform 0.1s; }
+.btn-primary:hover { background:var(--red2); }
+.btn-primary:active { transform:scale(0.98); }
+.btn-primary:disabled { opacity:0.45; cursor:not-allowed; }
+.btn-secondary { font-family:var(--mono); font-size:12px; letter-spacing:0.1em; text-transform:uppercase; padding:14px 24px; background:transparent; color:var(--muted); border:1px solid var(--dim); cursor:pointer; transition:border-color 0.2s,color 0.2s; }
+.btn-secondary:hover { border-color:var(--ink); color:var(--ink); }
+
+/* Archive */
+.archive-section { animation:riseIn 0.7s 0.15s ease both; }
+.archive-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1px; background:var(--dim); border:1px solid var(--dim); }
+.archive-card { background:var(--bg2); padding:1.5rem 1.75rem; cursor:pointer; transition:background 0.15s; display:flex; flex-direction:column; gap:10px; }
+.archive-card:hover { background:var(--bg3); }
+.archive-card-text { font-family:var(--serif); font-style:italic; font-size:16px; line-height:1.55; color:var(--ink); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.archive-card-meta { display:flex; align-items:center; justify-content:space-between; }
+.archive-card-author { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); }
+.archive-card-tag { font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+.archive-empty { grid-column:1/-1; padding:3rem; text-align:center; font-size:13px; color:var(--muted); }
+
+/* Modal */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:100; padding:2rem; opacity:0; transition:opacity 0.25s; pointer-events:none; }
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal-box { max-width:600px; width:100%; background:var(--bg2); border:1px solid var(--dim); padding:3rem 2.5rem; position:relative; transform:translateY(20px); transition:transform 0.25s; }
+.modal-overlay.open .modal-box { transform:translateY(0); }
+.modal-close { position:absolute; top:1rem; right:1rem; background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; transition:color 0.2s; }
+.modal-close:hover { color:var(--ink); }
+.modal-text { font-family:var(--serif); font-style:italic; font-size:clamp(20px,3vw,28px); line-height:1.65; color:var(--ink); margin-bottom:2rem; }
+.modal-byline { display:flex; align-items:center; gap:12px; }
+.modal-dash { width:24px; height:1px; background:var(--red); }
+.modal-author { font-size:12px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); }
+.modal-tag { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; padding:3px 10px; border:1px solid var(--dim); color:var(--muted); margin-left:auto; }
+
+/* Footer */
+footer { border-top:1px solid var(--dim); flex-direction:column; gap:0; display:flex; }
+.footer-top { padding:1.5rem 2.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; width:100%; }
+.footer-credits { width:100%; padding:1.25rem 2.5rem; border-top:1px solid var(--dim); display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; text-align:center; background:var(--bg2); }
+.footer-credits-text { font-size:11px; letter-spacing:0.08em; color:var(--muted); }
+.footer-credits-link { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--red); text-decoration:none; font-weight:500; border-bottom:1px solid transparent; transition:border-color 0.2s,color 0.2s; display:inline-flex; align-items:center; gap:5px; }
+.footer-credits-link:hover { color:var(--red2); border-bottom-color:var(--red2); }
+.yt-icon { width:16px; height:16px; vertical-align:middle; fill:currentColor; flex-shrink:0; }
+.footer-copy { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+.footer-count { font-family:var(--display); font-size:14px; letter-spacing:0.1em; color:var(--dim); }
+
+/* Toast */
+.toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(12px); background:var(--ink); color:var(--bg); font-size:12px; letter-spacing:0.08em; padding:10px 22px; opacity:0; transition:opacity 0.3s,transform 0.3s; pointer-events:none; z-index:200; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* Loading */
+.loading-bar { position:fixed; top:0; left:0; height:2px; background:var(--red); width:0%; transition:width 0.3s; z-index:1000; }
+.loading-bar.active { width:70%; }
+.loading-bar.done { width:100%; opacity:0; transition:width 0.2s,opacity 0.4s 0.2s; }
+
+@keyframes riseIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.spin { display:inline-block; width:12px; height:12px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:rot 0.6s linear infinite; vertical-align:middle; margin-right:8px; }
+@keyframes rot { to{transform:rotate(360deg)} }
+
+@media(max-width:600px){
+  header{flex-direction:column;align-items:flex-start;padding:2rem 1.5rem 1.5rem;}
+  main{padding:2rem 1.5rem;}
+  .qotd-frame{padding:2rem 1.5rem;}
+  footer{padding:0;}
+  .footer-top{padding:1rem 1.5rem;}
+  .footer-credits{padding:1rem 1.5rem;}
+  .issue-badge{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="loading-bar" id="loadingBar"></div>
+<div class="site">
+
+  <header>
+    <div class="logo-block">
+      <div class="logo-eyebrow">&#9632; Learning from experience</div>
+      <div class="logo-main">The School of<br><em>Hard Knockz</em></div>
+      <div class="logo-sub">Words to live by</div>
+    </div>
+    <div class="issue-badge">
+      <div class="issue-num" id="quoteCount">—</div>
+      <div class="issue-label">quotes archived</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="qotd-section">
+      <div class="section-tag">Quote of the Day</div>
+      <div class="qotd-frame" id="qotdFrame">
+        <div class="qotd-placeholder" id="qotdPlaceholder">Hit the button below to draw a quote from the archives.</div>
+        <div class="qotd-text" id="qotdText"></div>
+        <div class="qotd-footer" id="qotdFooter">
+          <div class="qotd-byline">
+            <div class="qotd-dash"></div>
+            <div class="qotd-author" id="qotdAuthor"></div>
+          </div>
+          <div class="qotd-tag" id="qotdTagEl"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" id="drawBtn" onclick="drawQuote()">&#9679;&nbsp; Give Me Today's Quote</button>
+        <button class="btn-secondary" onclick="copyQuote()">Copy Quote</button>
+      </div>
+    </section>
+
+    <section class="archive-section">
+      <div class="section-tag">Full Archive</div>
+      <div class="archive-grid" id="archiveGrid">
+        <div class="archive-empty">Loading archive...</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-top">
+      <div class="footer-copy">The School of Hard Knockz &copy; <span id="yr"></span></div>
+      <div class="footer-count" id="footerCount"></div>
+    </div>
+    <div class="footer-credits">
+      <span class="footer-credits-text">All quotes sourced from the official YouTube channel —</span>
+      <a class="footer-credits-link" href="https://www.youtube.com/@theschoolofhardknocks" target="_blank" rel="noopener noreferrer">
+        <svg class="yt-icon" viewBox="0 0 24 24"><path d="M23.5 6.2a3.01 3.01 0 0 0-2.12-2.13C19.54 3.6 12 3.6 12 3.6s-7.54 0-9.38.47A3.01 3.01 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.01 3.01 0 0 0 2.12 2.13C4.46 20.4 12 20.4 12 20.4s7.54 0 9.38-.47a3.01 3.01 0 0 0 2.12-2.13A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
+        The School of Hard Knocks
+      </a>
+    </div>
+  </footer>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-text" id="modalText"></div>
+    <div class="modal-byline">
+      <div class="modal-dash"></div>
+      <div class="modal-author" id="modalAuthor"></div>
+      <div class="modal-tag" id="modalTag"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://wyfpfdqvpbwitnzttshw.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5ZnBmZHF2cGJ3aXRuenR0c2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTI5MzcsImV4cCI6MjA5NTUyODkzN30.fUoJ1U81O0UFvxkM5O61jvA2nxqwn1Z1c0piVqPIZgg';
+
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+let quotes = [];
+let currentQuote = null;
+
+function loader(on) {
+  const b = document.getElementById('loadingBar');
+  if (on) { b.className = 'loading-bar active'; }
+  else { b.className = 'loading-bar done'; setTimeout(() => b.className = 'loading-bar', 600); }
+}
+
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function loadQuotes() {
+  loader(true);
+  try {
+    quotes = await apiFetch('quotes?select=*&order=created_at.desc');
+    renderArchive();
+    updateCounts();
+  } catch(e) {
+    document.getElementById('archiveGrid').innerHTML = '<div class="archive-empty">Could not load quotes. Check your connection.</div>';
+  }
+  loader(false);
+}
+
+function drawQuote() {
+  if (!quotes.length) { showToast('No quotes in the archive yet.'); return; }
+  const btn = document.getElementById('drawBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Drawing...';
+
+  const pool = currentQuote ? quotes.filter(q => q.id !== currentQuote.id) : quotes;
+  const q = pool.length ? pool[Math.floor(Math.random() * pool.length)] : quotes[0];
+  currentQuote = q;
+
+  setTimeout(() => {
+    const textEl = document.getElementById('qotdText');
+    const footEl = document.getElementById('qotdFooter');
+    document.getElementById('qotdPlaceholder').style.display = 'none';
+    textEl.textContent = `"${q.text}"`;
+    document.getElementById('qotdAuthor').textContent = q.author;
+    document.getElementById('qotdTagEl').textContent  = q.tag;
+    textEl.classList.remove('visible'); footEl.classList.remove('visible');
+    void textEl.offsetWidth;
+    textEl.classList.add('visible'); footEl.classList.add('visible');
+    btn.disabled = false;
+    btn.innerHTML = '&#9679;&nbsp; Another Quote';
+  }, 500);
+}
+
+function renderArchive() {
+  const grid = document.getElementById('archiveGrid');
+  if (!quotes.length) {
+    grid.innerHTML = '<div class="archive-empty">No quotes yet — check back soon.</div>';
+    return;
+  }
+  grid.innerHTML = quotes.map(q => `
+    <div class="archive-card" onclick="openModal(${q.id})">
+      <div class="archive-card-text">"${q.text}"</div>
+      <div class="archive-card-meta">
+        <div class="archive-card-author">${q.author}</div>
+        <div class="archive-card-tag">${q.tag}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateCounts() {
+  document.getElementById('quoteCount').textContent = quotes.length;
+  document.getElementById('footerCount').textContent = `${quotes.length} quote${quotes.length !== 1 ? 's' : ''}`;
+}
+
+function openModal(id) {
+  const q = quotes.find(x => x.id === id);
+  if (!q) return;
+  document.getElementById('modalText').textContent   = `"${q.text}"`;
+  document.getElementById('modalAuthor').textContent = q.author;
+  document.getElementById('modalTag').textContent    = q.tag;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal') || e.currentTarget.tagName === 'BUTTON')
+    document.getElementById('modal').classList.remove('open');
+}
+
+function copyQuote() {
+  if (!currentQuote) { showToast('Draw a quote first.'); return; }
+  const text = `"${currentQuote.text}" — ${currentQuote.author}`;
+  navigator.clipboard?.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => showToast('Copy failed.'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+loadQuotes();
+</script>
+</body>
+</html>
