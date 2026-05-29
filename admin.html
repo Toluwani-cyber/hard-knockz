@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TSOHK — Admin</title>
+<title>Hard Knockz — Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -174,8 +174,8 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-wrap">
-    <div class="login-logo">TSOHK <span>Admin</span></div>
-    <div class="login-caption">The School of Hard Knockz — Owner Access</div>
+    <div class="login-logo">Hard Knockz <span>Admin</span></div>
+    <div class="login-caption">Hard Knockz — Owner Access</div>
     <div class="login-card">
       <div class="login-title">Restricted Area</div>
       <div class="field">
@@ -198,7 +198,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 <!-- ADMIN -->
 <div id="adminScreen">
   <div class="topbar">
-    <div class="topbar-logo">TSOHK <span>Admin</span></div>
+    <div class="topbar-logo">Hard Knockz <span>Admin</span></div>
     <div class="topbar-badge">Owner Dashboard</div>
     <div class="topbar-spacer"></div>
     <a class="topbar-btn" href="index.html" target="_blank">↗ View Public Site</a>
@@ -227,7 +227,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
       <div class="form-field">
         <div class="form-label">Source / Author <span class="hint">optional</span></div>
-        <input class="form-ctrl" type="text" id="fAuthor" placeholder="e.g. The School of Hard Knockz">
+        <input class="form-ctrl" type="text" id="fAuthor" placeholder="e.g. The School of Hard Knocks">
       </div>
 
       <div class="form-field">
@@ -404,7 +404,7 @@ async function loadQuotes() {
 /* ── Add quote ── */
 async function addQuote() {
   const text   = document.getElementById('fText').value.trim();
-  const author = document.getElementById('fAuthor').value.trim() || 'The School of Hard Knockz';
+  const author = document.getElementById('fAuthor').value.trim() || 'The School of Hard Knocks';
   const tag    = document.getElementById('fTag').value.trim().toLowerCase() || 'general';
   if (!text) { showToast('Quote text is required.', 'err'); return; }
 
